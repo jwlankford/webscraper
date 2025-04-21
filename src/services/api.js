@@ -1,23 +1,27 @@
-const BASE_URL = 'http://127.0.0.1:5000'; // Replace with your actual base URL
+// frontend/src/services/api.js
 
-export async function scrapeWebsite(url, folder = 'screenshots') {
+import axios from 'axios';
+
+const apiClient = axios.create({
+  baseURL: 'http://127.0.0.1:5000',
+});
+
+export const scrapeWebsite = async (url) => {
   try {
-    const response = await fetch(`${BASE_URL}/scrape`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ url, folder }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'An error occurred while scraping');
-    }
-
-    return await response.json();
+    const response = await apiClient.post('/scrape', { url });
+    return response.data;
   } catch (error) {
     console.error('Error in scrapeWebsite:', error);
     throw error;
   }
-}
+};
+
+export const getScreenshots = async (url) => {
+  try {
+    const response = await apiClient.get(`/screenshots?url=${encodeURIComponent(url)}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching screenshots:', error);
+    throw error;
+  }
+};
